@@ -1,0 +1,12 @@
+FROM node:latest as NODE
+WORKDIR /app
+COPY . .
+RUN npm install
+RUN npm run build --prod
+
+FROM nginx:latest as NGINX
+RUN  touch /var/run/nginx.pid && \
+     chown -R nginx:nginx /var/cache/nginx /var/run/nginx.pid
+USER nginx
+
+COPY --chown=nginx:nginx --from=NODE /app/dist/angular-redux /usr/share/nginx/html
